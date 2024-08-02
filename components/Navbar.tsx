@@ -1,24 +1,16 @@
 import Link from "next/link";
-import {
-  icons,
-  LineChart,
-  Moon,
-  Package,
-  Package2,
-  Settings,
-  ShoppingCart,
-  Users2,
-} from "lucide-react";
+import { icons, Package2, PanelLeft, Settings } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import Icon from "./Icon";
 import { cn } from "@/lib/utils";
-import { ModeToggle } from "./ModeToggle";
 
 const items = [
   { label: "Dashboard", link: "/", icon: "House" },
@@ -50,21 +42,8 @@ function DesktopNavbar() {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              {/* <Link
-                href="#"
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-              >
-                <Moon className="h-5 w-5" />
-                <span className="sr-only">Theme</span>
-              </Link> */}
-              <ModeToggle />
-            </TooltipTrigger>
-            <TooltipContent side="right">Theme</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
               <Link
-                href="#"
+                href="/settings"
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
               >
                 <Settings className="h-5 w-5" />
@@ -79,19 +58,69 @@ function DesktopNavbar() {
   );
 }
 
+function MobileNavbar() {
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button size="icon" variant="outline" className="sm:hidden">
+          <PanelLeft className="h-5 w-5" />
+          <span className="sr-only">Toggle Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="sm:max-w-xs">
+        <nav className="grid gap-6 text-lg font-medium">
+          <Link
+            href="#"
+            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:h-8 md:w-8 md:text-base"
+          >
+            <Package2 className="h-4 w-4 transition-all group-hover:scale-110" />
+            <span className="sr-only">Finance Tracker</span>
+          </Link>
+          {items.map((item) => (
+            <NavbarItem
+              key={item.label}
+              label={item.label}
+              link={item.link}
+              icon={item.icon as keyof typeof icons}
+              mobile
+            />
+          ))}
+          <Link
+            href="/settings"
+            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+          >
+            <Settings className="h-5 w-5" />
+            <span>Settings</span>
+          </Link>
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 function NavbarItem({
   link,
   label,
   icon,
+  mobile,
 }: {
   link: string;
   label: string;
   icon: keyof typeof icons;
+  mobile?: boolean;
 }) {
   const pathname = usePathname();
   const isActive = pathname === link;
 
-  return (
+  return mobile ? (
+    <Link
+      href={link}
+      className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+    >
+      <Icon name={icon} />
+      <span>{label}</span>
+    </Link>
+  ) : (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -112,4 +141,4 @@ function NavbarItem({
   );
 }
 
-export { DesktopNavbar };
+export { DesktopNavbar, MobileNavbar };
